@@ -4,27 +4,10 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from time import sleep
 
-# Base URL
 base_url = "https://www.quantamagazine.org/archive/page/"
 
-# Directory to save images
-save_dir = "images"
-if not os.path.exists(save_dir):
-    os.makedirs(save_dir)
+fd = open("image_links.txt", "a")
 
-# Function to download an image from a URL
-def download_image(image_url, save_dir):
-    response = requests.get(image_url)
-    if response.status_code == 200:
-        image_name = os.path.basename(image_url)
-        image_path = os.path.join(save_dir, image_name)
-        with open(image_path, 'wb') as f:
-            f.write(response.content)
-        print(f"Downloaded {image_url}")
-    else:
-        print(f"Failed to download {image_url}")
-
-# Loop through pages
 for page_number in range(1, 221):
     page_url = f"{base_url}{page_number}/"
     print(f"Scraping {page_url}")
@@ -54,7 +37,7 @@ for page_number in range(1, 221):
                         image = figure.find('img')
                         if image and 'src' in image.attrs:
                             image_url = image['src']
-                            download_image(image_url, save_dir)
+                            fd.write(f"{image_url}\n")
                 else:
                     print(f"Failed to scrape {article_url}")
         
@@ -64,4 +47,5 @@ for page_number in range(1, 221):
     # Be polite and avoid spamming the server
     sleep(2)
 
+fd.close()
 print("Scraping completed.")
